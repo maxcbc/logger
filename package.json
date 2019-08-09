@@ -1,0 +1,19 @@
+{
+  "name": "@maxcbc/logger",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maxcbc/logger.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maxcbc/logger/issues"
+  },
+  "homepage": "https://github.com/maxcbc/logger#readme",
+  "dependencies": {
+    "winston": "^3.2.1"
+  }
+}
