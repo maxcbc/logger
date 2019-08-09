@@ -15,5 +15,17 @@
   "homepage": "https://github.com/maxcbc/logger#readme",
   "dependencies": {
     "winston": "^3.2.1"
+  },
+  "scripts": {
+    "lint:js": "eslint \"**/*.js\"",
+    "pre-commit": "npm run lint:js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "@maxcbc/eslint-config"
+    ]
+  },
+  "devDependencies": {
+    "@maxcbc/eslint-config": "0.0.9"
   }
 }
