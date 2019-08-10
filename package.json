@@ -26,6 +26,6 @@
     ]
   },
   "devDependencies": {
-    "@maxcbc/eslint-config": "0.0.10"
+    "@maxcbc/eslint-config": "0.0.11"
   }
 }
