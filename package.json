@@ -21,7 +21,9 @@
   },
   "scripts": {
     "lint:js": "eslint \"**/*.js\"",
-    "lint:js:fix": "eslint \"**/*.js\" --fix"
+    "lint:js:fix": "eslint \"**/*.js\" --fix",
+    "version": "git add package.json",
+    "postversion": "git push && git push --tags"
   },
   "eslintConfig": {
     "extends": [
