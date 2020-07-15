@@ -1,27 +1,40 @@
 'use strict';
-const winston = require('winston');
+/* eslint-disable no-console */
+const {snakeCase} = require('snake-case');
+const {LOG_LEVEL = 'INFO'} = process.env;
 
-const {NODE_ENV} = process.env;
+const levels = new Map([
+	['ERROR', 1],
+	['WARN', 2],
+	['INFO', 3],
+	['DEBUG', 4]
+]);
 
-const DEFAULT_METADATA = {
-	service: 'NOT_SET',
-	env: NODE_ENV
-};
+const logger = module.exports = {};
 
-const logger = module.exports = winston.createLogger({
-	defaultMeta: DEFAULT_METADATA,
-	transports: [
-		new winston.transports.Console({
-			format: winston.format.json()
-		})
-	]
-});
+for (const [levelName, levelNumber] of levels.entries()) {
+	const level = levelName.toLowerCase();
+	const transport = (console[level] || console.log).bind(console);
+
+	logger[level] = (event, detail = {}) => {
+		if (typeof event !== 'string') throw TypeError('event must be a string');
+		if (levelNumber > levels.get(LOG_LEVEL.toUpperCase())) return;
+		const statement = {
+			event: snakeCase(event).toUpperCase(),
+		};
+		if (detail && detail instanceof Error) {
+			statement.detail = {
+				message: detail.message,
+				stack: detail.stack
+			};
+			if (detail.code) statement.detail.code = detail.code;
+		} else if (detail) {
+			statement.detail = detail;
+		}
+		transport(statement);
+	};
+}
 
 
-logger.init = (options = {}) => {
-	if (!options.service) throw new Error('\'service\' cannot be undefined');
-	Object.assign(DEFAULT_METADATA, options);
-	return logger;
-};
 
 
