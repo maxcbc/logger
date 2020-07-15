@@ -1,51 +1,50 @@
-version: 2
-references:
-  workspace_root: &workspace_root
-    ~/project
-  attach_workspace: &attach_workspace
-    attach_workspace:
-      at: *workspace_root
-  npm_cache_keys: &npm_cache_keys
-    keys:
-        - v1-npm-cache-{{ checksum "package.json" }}
-  cache_npm_cache: &cache_npm_cache
-    save_cache:
-        key: v1-npm-cache-{{ checksum "package.json" }}
-        paths:
-        - ./node_modules/
-  restore_npm_cache: &restore_npm_cache
-    restore_cache:
-        <<: *npm_cache_keys
+version: 2.1
+parameters:
+  node_version:
+    type: integer
+    default: 12
+  cache_version:
+    type: integer
+    default: 1
+orbs:
+  node-module: maxcbc/node-module@0.0.3
+executors:
+  nodejs:
+    docker:
+      - image: circleci/node:<< pipeline.parameters.node_version >>
+    resource_class: small
 jobs:
   build:
-    working_directory: ~/project/build
-    docker:
-      - image: circleci/node:lts
+    executor: nodejs
     steps:
       - checkout
-      - *restore_npm_cache
+      - node-module/npm_install:
+          cache_version: << pipeline.parameters.cache_version >>
       - run:
-          name: Install project dependencies
-          command: npm install
-      - *cache_npm_cache
-      - persist_to_workspace:
-          root: *workspace_root
-          paths:
-            - build
-  lint:
-    working_directory: ~/project/build
-    docker:
-      - image: circleci/node:lts
+          name: eslint
+          command: |
+            mkdir -p test-results/eslint
+            eslint -f junit "**/*.js" > test-results/eslint/lint.xml
+      - store_test_results:
+          path: test-results
+
+  publish:
+    executor: nodejs
     steps:
-      - *attach_workspace
-      - run:
-          name: Lint JavaScript
-          command: npm run lint:js
+      - checkout
+      - node-module/login_to_github_package_registry
+      - node-module/restore_cached_node_modules:
+          cache_version: << pipeline.parameters.cache_version >>
+      - node-module/publish_to_github_package_registry
+
 workflows:
-  version: 2
-  build-validate:
+  version: 2.1
+  build-publish:
     jobs:
       - build
-      - lint:
+      - publish:
           requires:
             - build
+          filters:
+            branches:
+              only: master

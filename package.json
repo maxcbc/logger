@@ -14,18 +14,24 @@
   },
   "homepage": "https://github.com/maxcbc/logger#readme",
   "dependencies": {
-    "winston": "^3.2.1"
+    "winston": "3.2.1"
   },
   "scripts": {
     "lint:js": "eslint \"**/*.js\"",
-    "pre-commit": "npm run lint:js"
+    "lint:js:fix": "eslint \"**/*.js\" --fix"
   },
   "eslintConfig": {
     "extends": [
-      "@maxcbc/eslint-config"
+      "@maxcbc/eslint-config-maxcbc"
     ]
   },
   "devDependencies": {
-    "@maxcbc/eslint-config": "0.0.11"
+    "@maxcbc/eslint-config-maxcbc": "0.3.0",
+    "husky": "4.2.5"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "circleci config validate && npm run lint:js:fix"
+    }
   }
 }
