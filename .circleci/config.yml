@@ -7,7 +7,7 @@ parameters:
     type: integer
     default: 1
 orbs:
-  node-module: maxcbc/node-module@0.0.4
+  node-module: maxcbc/node-module@0.0.6
 executors:
   nodejs:
     docker:
