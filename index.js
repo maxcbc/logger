@@ -4,21 +4,24 @@ const {snakeCase} = require('snake-case');
 const {LOG_LEVEL = 'INFO'} = process.env;
 
 const levels = new Map([
+	['NONE', 0],
 	['ERROR', 1],
 	['WARN', 2],
 	['INFO', 3],
 	['DEBUG', 4]
 ]);
 
-const logger = module.exports = {};
+module.exports = {
+	error: createLogger('ERROR', console.error.bind(console)),
+	warn: createLogger('WARN', console.warn.bind(console)),
+	info: createLogger('INFO', console.info.bind(console)),
+	debug: createLogger('DEBUG', console.debug.bind(console))
+};
 
-for (const [levelName, levelNumber] of levels.entries()) {
-	const level = levelName.toLowerCase();
-	const transport = (console[level] || console.log).bind(console);
-
-	logger[level] = (event, detail = {}) => {
+function createLogger (levelName, transport) {
+	return (event, detail = {}) => {
 		if (typeof event !== 'string') throw TypeError('event must be a string');
-		if (levelNumber > levels.get(LOG_LEVEL.toUpperCase())) return;
+		if (levels.get(levelName) > levels.get(LOG_LEVEL.toUpperCase())) return;
 		const statement = {
 			event: snakeCase(event).toUpperCase(),
 		};
@@ -34,7 +37,6 @@ for (const [levelName, levelNumber] of levels.entries()) {
 		transport(statement);
 	};
 }
-
 
 
 
